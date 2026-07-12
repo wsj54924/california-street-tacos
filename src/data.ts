@@ -124,16 +124,7 @@ export const MENU_ITEMS: MenuItem[] = [
     image: img('jarritos.jpg'),
     customizable: false,
   },
-  {
-    id: 'coke-sprite',
-    name: 'Mexican Coke / Sprite',
-    category: 'drinks',
-    price: 3,
-    description: 'Glass bottle Mexican Coke or Sprite, served cold.',
-    image: img('menu-board.jpg'),
-    customizable: false,
-  },
-  {
+ {
     id: 'horchata',
     name: 'Horchata',
     category: 'drinks',
