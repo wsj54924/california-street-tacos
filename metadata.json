@@ -1,0 +1,6 @@
+{
+  "name": "California Street Tacos",
+  "description": "Authentic California-style street tacos, burritos, and fresh Mexican plates in Tulsa, OK. Browse our menu, customize ingredients, and place your order online.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
