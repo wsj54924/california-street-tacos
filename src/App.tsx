@@ -22,10 +22,57 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { MENU_ITEMS, MEATS, STYLES, GALLERY_IMAGES } from './data';
+import { getDemoBySlug, type DemoConfig } from './data/demos';
 import { MenuItem, CartItem, CustomizationOptions, Order } from './types';
 
+const getCurrentSlug = () => window.location.pathname.replace(/^\/+|\/+$/g, '');
+
+function PreviewHome() {
+  return (
+    <main className="min-h-screen bg-[#fcf9f4] text-[#1c1c19] flex items-center justify-center px-6">
+      <div className="max-w-xl text-center space-y-4">
+        <p className="text-xs font-black tracking-[0.18em] uppercase text-[#9e0027]">Joren Studio</p>
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Preview</h1>
+        <p className="text-gray-600 font-medium">Private demo links are shared directly with each client.</p>
+      </div>
+    </main>
+  );
+}
+
+function DemoNotFound() {
+  return (
+    <main className="min-h-screen bg-[#fcf9f4] text-[#1c1c19] flex items-center justify-center px-6">
+      <div className="max-w-xl text-center space-y-4">
+        <p className="text-xs font-black tracking-[0.18em] uppercase text-[#9e0027]">404</p>
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Demo not found</h1>
+        <p className="text-gray-600 font-medium">Check the preview link and try again.</p>
+      </div>
+    </main>
+  );
+}
+
 export default function App() {
-  // Navigation / UI states
+  const slug = getCurrentSlug();
+
+  if (!slug) {
+    return <PreviewHome />;
+  }
+
+  const demo = getDemoBySlug(slug);
+
+  if (!demo || demo.type !== 'restaurant') {
+    return <DemoNotFound />;
+  }
+
+  return <RestaurantDemo demo={demo} />;
+}
+
+function RestaurantDemo({ demo }: { demo: DemoConfig }) {
+const phoneHref = `tel:${demo.phone.replace(/\D/g, '')}`;
+const cartStorageKey = `${demo.slug}_cart`;
+const ordersStorageKey = `${demo.slug}_orders`;
+
+// Navigation / UI states
   const [activeTab, setActiveTab] = useState<'all' | 'tacos' | 'burritos' | 'mains' | 'drinks'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -66,7 +113,7 @@ export default function App() {
 
   // Load cart and orders from LocalStorage on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem('cali_tacos_cart');
+const savedCart = localStorage.getItem(cartStorageKey);
     if (savedCart) {
       try {
         setCart(JSON.parse(savedCart));
@@ -75,7 +122,7 @@ export default function App() {
       }
     }
 
-    const savedOrders = localStorage.getItem('cali_tacos_orders');
+const savedOrders = localStorage.getItem(ordersStorageKey);
     if (savedOrders) {
       try {
         const parsedOrders = JSON.parse(savedOrders) as Order[];
@@ -90,17 +137,17 @@ export default function App() {
         console.error('Failed to parse orders');
       }
     }
-  }, []);
+}, [cartStorageKey, ordersStorageKey]);
 
   // Save cart to LocalStorage
   useEffect(() => {
-    localStorage.setItem('cali_tacos_cart', JSON.stringify(cart));
-  }, [cart]);
+localStorage.setItem(cartStorageKey, JSON.stringify(cart));
+}, [cart, cartStorageKey]);
 
   // Save orders to LocalStorage
   useEffect(() => {
-    localStorage.setItem('cali_tacos_orders', JSON.stringify(orders));
-  }, [orders]);
+localStorage.setItem(ordersStorageKey, JSON.stringify(orders));
+}, [orders, ordersStorageKey]);
 
   // Simulate Order Progress
   useEffect(() => {
@@ -346,7 +393,7 @@ export default function App() {
               <Utensils className="w-5 h-5" />
             </div>
             <div>
- <span className="text-xl md:text-2xl font-extrabold text-[#9e0027] tracking-tight">California Street Tacos</span>
+<span className="text-xl md:text-2xl font-extrabold text-[#9e0027] tracking-tight">{demo.name}</span>
               <span className="text-xs block text-gray-500 font-medium -mt-1">Real Street Tacos, Made Fresh</span>
             </div>
           </div>
@@ -355,7 +402,7 @@ export default function App() {
             {/* Call Button */}
             <a 
               className="bg-[#9e0027] text-white text-xs md:text-sm font-bold px-4 py-2.5 rounded-full hover:bg-[#A31830] transition-colors flex items-center gap-2 shadow-sm"
-              href="tel:9186055484"
+href={phoneHref}
             >
               <Phone className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Call Now</span>
@@ -425,12 +472,12 @@ export default function App() {
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#1A1A1A] tracking-tight leading-tight">
-                Real Street Tacos, <br />
-                <span className="text-[#9e0027] underline decoration-[#ffe16d] decoration-4 underline-offset-4">Made Fresh Daily</span>
+                {demo.heroTitle.split(', ')[0]}, <br />
+                <span className="text-[#9e0027] underline decoration-[#ffe16d] decoration-4 underline-offset-4">{demo.heroTitle.split(', ')[1] ?? 'Made Fresh Daily'}</span>
               </h1>
               
               <p className="text-lg text-gray-700 font-medium leading-relaxed">
-                Fresh tacos, burritos, quesadillas, Jarritos, and loaded plates served from the California Street Tacos truck. Call ahead, pick up hot, and bring extra napkins.</p>
+                Fresh tacos, burritos, quesadillas, Jarritos, and loaded plates served from the {demo.name} truck. Call ahead, pick up hot, and bring extra napkins.</p>
 
               <div className="flex flex-wrap gap-4 pt-2">
                 <a 
@@ -455,7 +502,7 @@ export default function App() {
                   <span className="text-xs font-medium text-gray-500">Made to order</span>
                 </div>
                 <div className="text-center md:text-left border-x border-[#e5e2dd] px-2">
-                  <span className="block text-xl font-bold text-[#006e0a]">Tulsa, OK</span>
+                  <span className="block text-xl font-bold text-[#006e0a]">{demo.city}</span>
                   <span className="text-xs font-medium text-gray-500">Local Food Truck</span>
                 </div>
                 <div className="text-center md:text-left">
@@ -500,7 +547,7 @@ export default function App() {
               {/* Food truck collage */}
               <div className="col-span-3 row-span-3 row-start-4 rounded-2xl overflow-hidden shadow-lg hover:scale-[1.02] transition-transform duration-500">
                 <img 
-                  alt="California Street Tacos food truck" 
+                  alt={`${demo.name} food truck`}
                   className="w-full h-full object-cover" 
                   src="/images/food-truck.jpg"
                 />
@@ -725,7 +772,7 @@ placeholder="Search our delicious items..."
               <div className="absolute -top-6 -left-6 w-32 h-32 bg-[#006e0a] rounded-full opacity-5 z-0" />
               <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl border border-[#e5e2dd] aspect-video">
                 <img 
-                  alt="California Street Tacos food truck outside" 
+                  alt={`${demo.name} food truck outside`}
                   className="w-full h-full object-cover" 
                   src="/images/food-truck.jpg"
                 />
@@ -736,9 +783,9 @@ placeholder="Search our delicious items..."
             <div className="w-full lg:w-1/2 space-y-6">
               <div>
                 <span className="text-xs font-bold text-[#9e0027] tracking-wider uppercase">VISIT OUR TRUCK</span>
-                <h2 className="text-3xl md:text-4xl font-extrabold text-[#1c1c19] mt-1">Find Us In Tulsa, OK</h2>
+                <h2 className="text-3xl md:text-4xl font-extrabold text-[#1c1c19] mt-1">Find Us In {demo.city}</h2>
                 <p className="text-gray-600 font-medium mt-2">
-                  We serve hot street tacos from the black California Street Tacos truck. Look for the menu board by the window.
+                  We serve hot street tacos from the black {demo.name} truck. Look for the menu board by the window.
                 </p>
               </div>
 
@@ -750,7 +797,7 @@ placeholder="Search our delicious items..."
                   </div>
                   <div>
                     <h4 className="font-bold text-sm text-gray-900">Current Spot</h4>
-                    <p className="text-sm text-gray-600 mt-1">Tulsa, OK (and surrounding events)</p>
+                    <p className="text-sm text-gray-600 mt-1">{demo.city} (and surrounding events)</p>
                     <span className="text-[11px] font-bold text-[#006e0a] flex items-center gap-1 mt-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#006e0a] animate-pulse" />
                       Parked at Peoria Ave
@@ -775,7 +822,7 @@ placeholder="Search our delicious items..."
                   </div>
                   <div>
                     <h4 className="font-bold text-sm text-gray-900">Call Ahead / Catering</h4>
-                    <p className="text-sm text-gray-600 mt-1">918-605-5484</p>
+                    <p className="text-sm text-gray-600 mt-1">{demo.phone}</p>
                     <p className="text-xs text-[#006e0a] font-bold mt-0.5">Skip the line by ordering online!</p>
                   </div>
                 </div>
@@ -899,7 +946,7 @@ placeholder="Search our delicious items..."
                   className="min-w-[280px] sm:min-w-[320px] h-60 rounded-2xl overflow-hidden shadow-md shrink-0 snap-center border border-[#e5e2dd] hover:scale-[1.02] transition-transform duration-300 relative group"
                 >
                   <img 
-                    alt={`California Street Tacos gallery ${index + 1}`} 
+                    alt={`${demo.name} gallery ${index + 1}`}
                     className="w-full h-full object-cover" 
                     src={imgUrl}
                   />
@@ -920,21 +967,21 @@ placeholder="Search our delicious items..."
       <footer className="bg-[#1A1A1A] text-gray-300 py-16 border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col items-center text-center">
           
-          <span className="text-2xl font-extrabold text-[#9e0027] tracking-tight">California Street Tacos</span>
+          <span className="text-2xl font-extrabold text-[#9e0027] tracking-tight">{demo.name}</span>
           <p className="text-xs text-[#ffe16d] font-bold tracking-wider uppercase mt-1">Tulsa&apos;s Authentic Taco Truck</p>
 
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 my-8 text-sm font-semibold">
             <a href="#menu" className="hover:text-[#ffe16d] transition-colors">Order Online</a>
             <a href="#visit" className="hover:text-[#ffe16d] transition-colors">Our Location</a>
-            <a href="tel:9186055484" className="hover:text-[#ffe16d] transition-colors">Call 918-605-5484</a>
+            <a href={phoneHref} className="hover:text-[#ffe16d] transition-colors">Call {demo.phone}</a>
           </div>
 
           <p className="text-xs text-gray-500 max-w-sm leading-relaxed mb-6">
-            Proudly serving Tulsa the absolute most authentic street taco experience since 2021. Handmade recipes, real ingredients, and real salsa heat.
+            Proudly serving {demo.city} the absolute most authentic street taco experience since 2021. Handmade recipes, real ingredients, and real salsa heat.
           </p>
 
           <div className="w-full max-w-lg border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500">
-            <span>© 2026 California Street Tacos. All rights reserved.</span>
+            <span>© 2026 {demo.name}. All rights reserved.</span>
             <div className="flex gap-4 font-semibold">
               <a href="#" className="hover:underline">Privacy Policy</a>
               <span>•</span>
