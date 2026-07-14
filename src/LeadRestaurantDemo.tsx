@@ -4,7 +4,6 @@ import {
   Mail,
   MapPin,
   Phone,
-  Sparkles,
   Star,
   Utensils,
 } from 'lucide-react';
@@ -14,13 +13,82 @@ import type { LeadRestaurantDemoConfig } from './data/demos';
 const phoneHref = (phone: string) => `tel:${phone.replace(/\D/g, '')}`;
 const emailHref = (email: string) => `mailto:${email}`;
 
+type HeroVariant = 'seafood' | 'truck' | 'taqueria';
+
 interface LeadRestaurantDemoProps {
   demo: LeadRestaurantDemoConfig;
+}
+
+function getVariant(slug: string): HeroVariant {
+  if (slug.includes('corey')) return 'seafood';
+  if (slug.includes('lidia')) return 'truck';
+  return 'taqueria';
+}
+
+function HeroMedia({ demo, variant }: { demo: LeadRestaurantDemoConfig; variant: HeroVariant }) {
+  const [first, second, third, fourth] = demo.galleryImages;
+
+  if (variant === 'seafood') {
+    return (
+      <div className="grid gap-3 lg:grid-cols-5">
+        <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-lg lg:col-span-3">
+          <img src={demo.heroImage} alt={`${demo.name} seafood plate`} className="h-[380px] w-full object-cover md:h-[500px]" />
+        </div>
+        <div className="grid gap-3 lg:col-span-2">
+          <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm">
+            <img src={demo.menuImage ?? demo.featureImage} alt={`${demo.name} menu board`} className="h-44 w-full object-cover md:h-[242px]" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <img src={first} alt={`${demo.name} fried seafood`} className="h-40 w-full rounded-2xl object-cover shadow-sm md:h-[245px]" />
+            <div className="rounded-2xl bg-[var(--accent-soft)] p-5 text-[var(--accent-dark)]">
+              <Star className="mb-8 h-7 w-7 fill-[var(--accent)] text-[var(--accent)]" />
+              <p className="text-sm font-black uppercase tracking-[0.14em]">{demo.cuisine}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (variant === 'truck') {
+    return (
+      <div className="grid gap-3 md:grid-cols-5">
+        <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-lg md:col-span-3">
+          <img src={demo.heroImage} alt={`${demo.name} tacos`} className="h-[360px] w-full object-cover md:h-[500px]" />
+        </div>
+        <div className="grid gap-3 md:col-span-2">
+          <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm">
+            <img src={demo.featureImage} alt={`${demo.name} menu`} className="h-44 w-full object-cover md:h-56" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <img src={second} alt={`${demo.name} plate`} className="h-36 w-full rounded-2xl object-cover shadow-sm md:h-[260px]" />
+            <img src={third} alt={`${demo.name} combo`} className="h-36 w-full rounded-2xl object-cover shadow-sm md:h-[260px]" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-3 md:grid-cols-6">
+      <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-lg md:col-span-4">
+        <img src={demo.heroImage} alt={`${demo.name} fajita tacos`} className="h-[350px] w-full object-cover md:h-[500px]" />
+      </div>
+      <div className="grid gap-3 md:col-span-2">
+        <div className="rounded-2xl bg-[var(--accent-dark)] p-5 text-white">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-white/70">Wichita pickup</p>
+          <p className="mt-6 text-2xl font-black leading-tight">{demo.menuHighlights[0].name}</p>
+        </div>
+        <img src={fourth ?? first} alt={`${demo.name} plate`} className="h-40 w-full rounded-2xl object-cover shadow-sm md:h-[250px]" />
+      </div>
+    </div>
+  );
 }
 
 export default function LeadRestaurantDemo({ demo }: LeadRestaurantDemoProps) {
   const primaryHref = demo.phone ? phoneHref(demo.phone) : emailHref(demo.email);
   const primaryLabel = demo.phone ? 'Call Now' : 'Email Now';
+  const variant = getVariant(demo.slug);
 
   return (
     <main
@@ -33,8 +101,8 @@ export default function LeadRestaurantDemo({ demo }: LeadRestaurantDemoProps) {
         } as CSSProperties
       }
     >
-      <header className="sticky top-0 z-40 border-b border-black/10 bg-[#fbfaf7]/90 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 md:px-8">
+      <header className="sticky top-0 z-40 border-b border-black/10 bg-[#fbfaf7]/92 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-8">
           <a href="#" className="flex min-w-0 items-center gap-3">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent-dark)]">
               <Utensils className="h-5 w-5" />
@@ -61,18 +129,18 @@ export default function LeadRestaurantDemo({ demo }: LeadRestaurantDemoProps) {
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-4 py-10 md:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:py-16">
-        <div className="space-y-7">
-          <div className="inline-flex items-center gap-2 rounded-full bg-[var(--accent-soft)] px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-[var(--accent-dark)]">
-            <Sparkles className="h-4 w-4" />
+      <section className="mx-auto grid max-w-7xl gap-7 px-4 py-6 md:px-8 lg:grid-cols-[0.86fr_1.14fr] lg:gap-10 lg:py-8">
+        <div className="flex flex-col justify-start gap-6 lg:pt-5">
+          <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[var(--accent-soft)] px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-[var(--accent-dark)]">
+            <Star className="h-4 w-4 fill-[var(--accent)] text-[var(--accent)]" />
             Private demo preview
           </div>
 
-          <div className="space-y-5">
-            <h1 className="max-w-3xl text-4xl font-black leading-[1.02] tracking-tight md:text-6xl">
+          <div className="space-y-4">
+            <h1 className="max-w-3xl text-4xl font-black leading-[1.02] tracking-tight md:text-5xl xl:text-6xl">
               {demo.heroTitle}
             </h1>
-            <p className="max-w-2xl text-lg font-semibold leading-relaxed text-zinc-700">
+            <p className="max-w-xl text-base font-semibold leading-relaxed text-zinc-700 md:text-lg">
               {demo.tagline}
             </p>
           </div>
@@ -93,55 +161,41 @@ export default function LeadRestaurantDemo({ demo }: LeadRestaurantDemoProps) {
             </a>
           </div>
 
-          <div className="grid max-w-2xl grid-cols-3 gap-3 border-t border-black/10 pt-6">
+          <div className="grid max-w-2xl grid-cols-3 gap-3 border-t border-black/10 pt-5">
             <div>
-              <span className="block text-xl font-black text-[var(--accent-dark)]">{demo.rating}</span>
+              <span className="block text-lg font-black text-[var(--accent-dark)] md:text-xl">{demo.rating}</span>
               <span className="text-xs font-bold text-zinc-500">Social proof</span>
             </div>
             <div>
-              <span className="block text-xl font-black text-[var(--accent-dark)]">{demo.city.split(',')[0]}</span>
+              <span className="block text-lg font-black text-[var(--accent-dark)] md:text-xl">{demo.city.split(',')[0]}</span>
               <span className="text-xs font-bold text-zinc-500">Local service</span>
             </div>
             <div>
-              <span className="block text-xl font-black text-[var(--accent-dark)]">Photos</span>
-              <span className="text-xs font-bold text-zinc-500">Real menu assets</span>
+              <span className="block text-lg font-black text-[var(--accent-dark)] md:text-xl">Photos</span>
+              <span className="text-xs font-bold text-zinc-500">Real assets</span>
             </div>
+          </div>
+
+          <div className="rounded-2xl border border-black/10 bg-white p-4 shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-[var(--accent)]">{demo.cuisine}</p>
+            <p className="mt-2 text-sm font-semibold leading-relaxed text-zinc-600">{demo.description}</p>
           </div>
         </div>
 
-        <div className="grid min-h-[520px] grid-cols-6 grid-rows-6 gap-3">
-          <div className="col-span-6 row-span-4 overflow-hidden rounded-2xl shadow-xl md:col-span-4 md:row-span-4">
-            <img src={demo.heroImage} alt={`${demo.name} signature food`} className="h-full w-full object-cover" />
-          </div>
-          <div className="col-span-3 row-span-2 overflow-hidden rounded-2xl shadow-lg md:col-span-2 md:col-start-5">
-            <img src={demo.featureImage} alt={`${demo.name} featured plate`} className="h-full w-full object-cover" />
-          </div>
-          <div className="col-span-3 row-span-2 overflow-hidden rounded-2xl bg-[var(--accent-soft)] p-4 md:col-span-2 md:col-start-5">
-            <div className="flex h-full flex-col justify-between">
-              <Star className="h-7 w-7 fill-[var(--accent)] text-[var(--accent)]" />
-              <div>
-                <p className="text-sm font-black uppercase tracking-[0.16em] text-[var(--accent-dark)]">{demo.cuisine}</p>
-                <p className="mt-2 text-sm font-semibold leading-relaxed text-zinc-700">{demo.description}</p>
-              </div>
-            </div>
-          </div>
-          <div className="col-span-6 row-span-2 overflow-hidden rounded-2xl shadow-lg md:col-span-4">
-            <img src={demo.galleryImages[0]} alt={`${demo.name} food spread`} className="h-full w-full object-cover" />
-          </div>
-        </div>
+        <HeroMedia demo={demo} variant={variant} />
       </section>
 
-      <section id="menu" className="border-y border-black/10 bg-white px-4 py-16 md:px-8">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+      <section id="menu" className="border-y border-black/10 bg-white px-4 py-12 md:px-8">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
           <div className="space-y-5">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--accent)]">Menu preview</p>
-            <h2 className="text-3xl font-black tracking-tight md:text-5xl">Make the best dishes impossible to miss.</h2>
+            <h2 className="text-3xl font-black tracking-tight md:text-5xl">Put the best dishes above the fold.</h2>
             <p className="max-w-xl text-base font-semibold leading-relaxed text-zinc-600">
-              This section gives customers a fast reason to call, message, or save the page before they scroll away.
+              The menu section gives customers a quick reason to call, message, or save the page.
             </p>
             {demo.menuImage && (
               <div className="overflow-hidden rounded-2xl border border-black/10 bg-zinc-50">
-                <img src={demo.menuImage} alt={`${demo.name} menu board`} className="h-72 w-full object-cover" />
+                <img src={demo.menuImage} alt={`${demo.name} menu board`} className="h-64 w-full object-cover" />
               </div>
             )}
           </div>
@@ -162,7 +216,7 @@ export default function LeadRestaurantDemo({ demo }: LeadRestaurantDemoProps) {
         </div>
       </section>
 
-      <section id="gallery" className="mx-auto max-w-7xl px-4 py-16 md:px-8">
+      <section id="gallery" className="mx-auto max-w-7xl px-4 py-14 md:px-8">
         <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--accent)]">Photo gallery</p>
