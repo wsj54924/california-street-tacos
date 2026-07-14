@@ -22,7 +22,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { MENU_ITEMS, MEATS, STYLES, GALLERY_IMAGES } from './data';
-import { getDemoBySlug, type DemoConfig } from './data/demos';
+import { getDemoBySlug, type DemoConfig, type LeadRestaurantDemoConfig } from './data/demos';
+import LeadRestaurantDemo from './LeadRestaurantDemo';
 import { MenuItem, CartItem, CustomizationOptions, Order } from './types';
 
 const getCurrentSlug = () => window.location.pathname.replace(/^\/+|\/+$/g, '');
@@ -62,6 +63,10 @@ export default function App() {
 
   if (!demo || demo.type !== 'restaurant') {
     return <DemoNotFound />;
+  }
+
+  if ('template' in demo && demo.template === 'lead-restaurant') {
+    return <LeadRestaurantDemo demo={demo as LeadRestaurantDemoConfig} />;
   }
 
   return <RestaurantDemo demo={demo} />;
